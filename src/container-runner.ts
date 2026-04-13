@@ -261,7 +261,10 @@ async function buildContainerArgs(
       envVars['GITHUB_TOKEN'];
     if (token) {
       args.push('-e', `GITHUB_TOKEN=${token}`);
-      logger.info({ containerName }, 'GitHub token injected from .env fallback');
+      logger.info(
+        { containerName },
+        'GitHub token injected from .env fallback',
+      );
     } else {
       logger.warn(
         { containerName },

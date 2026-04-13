@@ -169,7 +169,10 @@ export async function startRemoteControl(
         };
         activeSession = session;
         saveState(session);
-        logger.info({ url: match[0], pid, sender, chatJid }, 'Remote Control session started');
+        logger.info(
+          { url: match[0], pid, sender, chatJid },
+          'Remote Control session started',
+        );
         resolve({ ok: true, url: match[0] });
         return;
       }
@@ -184,7 +187,10 @@ export async function startRemoteControl(
             // already dead
           }
         }
-        resolve({ ok: false, error: 'Timed out waiting for Remote Control URL' });
+        resolve({
+          ok: false,
+          error: 'Timed out waiting for Remote Control URL',
+        });
         return;
       }
 
@@ -195,7 +201,9 @@ export async function startRemoteControl(
   });
 }
 
-export function stopRemoteControl(): { ok: true } | { ok: false; error: string } {
+export function stopRemoteControl():
+  | { ok: true }
+  | { ok: false; error: string } {
   if (!activeSession) {
     return { ok: false, error: 'No active Remote Control session' };
   }
