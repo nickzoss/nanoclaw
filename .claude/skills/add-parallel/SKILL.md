@@ -1,3 +1,9 @@
+---
+name: add-parallel-ai
+title: Add Parallel AI Integration
+description: Adds Parallel AI MCP integration to NanoClaw for advanced web research capabilities.
+---
+
 # Add Parallel AI Integration
 
 Adds Parallel AI MCP integration to NanoClaw for advanced web research capabilities.
@@ -125,7 +131,7 @@ allowedTools: [
   'mcp__nanoclaw__*',
   'mcp__parallel-search__*',
   'mcp__parallel-task__*'
-],
+]
 ```
 
 ### 5. Add Usage Instructions to CLAUDE.md
