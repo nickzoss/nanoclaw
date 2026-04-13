@@ -27,6 +27,7 @@ import {
 import { OneCLI } from '@onecli-sh/sdk';
 import { validateAdditionalMounts } from './mount-security.js';
 import { RegisteredGroup } from './types.js';
+import { readEnvFile } from './env.js';
 
 const onecli = new OneCLI({ url: ONECLI_URL });
 
@@ -68,7 +69,7 @@ function buildVolumeMounts(
 
   if (isMain) {
     // Main gets the project root read-only. Writable paths the agent needs
-    // (store, group folder, IPC, .claude/) are mounted separately below.
+    // (store, group folder, IPC, .copilot/) are mounted separately below.
     // Read-only prevents the agent from modifying host application code
     // (src/, dist/, package.json, etc.) which would bypass the sandbox
     // entirely on next restart.
@@ -134,53 +135,35 @@ function buildVolumeMounts(
     }
   }
 
-  // Per-group Claude sessions directory (isolated from other groups)
-  // Each group gets their own .claude/ to prevent cross-group session access
+  // Per-group Copilot sessions directory (isolated from other groups)
+  // Each group gets their own .copilot/ to prevent cross-group session access
   const groupSessionsDir = path.join(
     DATA_DIR,
     'sessions',
     group.folder,
-    '.claude',
+    '.copilot',
   );
   fs.mkdirSync(groupSessionsDir, { recursive: true });
-  const settingsFile = path.join(groupSessionsDir, 'settings.json');
-  if (!fs.existsSync(settingsFile)) {
-    fs.writeFileSync(
-      settingsFile,
-      JSON.stringify(
-        {
-          env: {
-            // Enable agent swarms (subagent orchestration)
-            // https://code.claude.com/docs/en/agent-teams#orchestrate-teams-of-claude-code-sessions
-            CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS: '1',
-            // Load CLAUDE.md from additional mounted directories
-            // https://code.claude.com/docs/en/memory#load-memory-from-additional-directories
-            CLAUDE_CODE_ADDITIONAL_DIRECTORIES_CLAUDE_MD: '1',
-            // Enable Claude's memory feature (persists user preferences between sessions)
-            // https://code.claude.com/docs/en/memory#manage-auto-memory
-            CLAUDE_CODE_DISABLE_AUTO_MEMORY: '0',
-          },
-        },
-        null,
-        2,
-      ) + '\n',
-    );
-  }
 
-  // Sync skills from container/skills/ into each group's .claude/skills/
+  // Sync skills from container/skills/ into each group's .copilot/agents/
+  // Skills are custom agent profiles (markdown with YAML frontmatter) that
+  // copilot loads from ~/.copilot/agents/ to extend its capabilities.
   const skillsSrc = path.join(process.cwd(), 'container', 'skills');
-  const skillsDst = path.join(groupSessionsDir, 'skills');
+  const agentsDst = path.join(groupSessionsDir, 'agents');
   if (fs.existsSync(skillsSrc)) {
+    fs.mkdirSync(agentsDst, { recursive: true });
     for (const skillDir of fs.readdirSync(skillsSrc)) {
       const srcDir = path.join(skillsSrc, skillDir);
       if (!fs.statSync(srcDir).isDirectory()) continue;
-      const dstDir = path.join(skillsDst, skillDir);
-      fs.cpSync(srcDir, dstDir, { recursive: true });
+      const skillMdPath = path.join(srcDir, 'SKILL.md');
+      if (fs.existsSync(skillMdPath)) {
+        fs.copyFileSync(skillMdPath, path.join(agentsDst, `${skillDir}.md`));
+      }
     }
   }
   mounts.push({
     hostPath: groupSessionsDir,
-    containerPath: '/home/node/.claude',
+    containerPath: '/home/node/.copilot',
     readonly: false,
   });
 
@@ -263,8 +246,28 @@ async function buildContainerArgs(
   } else {
     logger.warn(
       { containerName },
-      'OneCLI gateway not reachable — container will have no credentials',
+      'OneCLI gateway not reachable — falling back to .env credentials',
     );
+    // Fall back: read GitHub token directly from .env and inject into container.
+    // Checked in precedence order per copilot CLI docs.
+    const envVars = readEnvFile([
+      'COPILOT_GITHUB_TOKEN',
+      'GH_TOKEN',
+      'GITHUB_TOKEN',
+    ]);
+    const token =
+      envVars['COPILOT_GITHUB_TOKEN'] ||
+      envVars['GH_TOKEN'] ||
+      envVars['GITHUB_TOKEN'];
+    if (token) {
+      args.push('-e', `GITHUB_TOKEN=${token}`);
+      logger.info({ containerName }, 'GitHub token injected from .env fallback');
+    } else {
+      logger.warn(
+        { containerName },
+        'No GitHub token found in .env — copilot will fail to authenticate',
+      );
+    }
   }
 
   // Runtime-specific args for host gateway resolution

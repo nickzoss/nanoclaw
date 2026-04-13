@@ -27,10 +27,10 @@ Run these commands and compile the results into the report format below.
 List skill directories available to you:
 
 ```bash
-ls -1 /home/node/.claude/skills/ 2>/dev/null || echo "No skills found"
+ls -1 /home/node/.copilot/agents/ 2>/dev/null || echo "No agents found"
 ```
 
-Each directory is an installed skill. The directory name is the skill name (e.g., `agent-browser` → `/agent-browser`).
+Each file is an installed agent profile. The file name (without `.md`) is the agent name (e.g., `agent-browser.md` → `agent-browser`).
 
 ### 2. Available tools
 

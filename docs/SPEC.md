@@ -78,7 +78,7 @@ A personal Claude assistant with multi-channel support, persistent memory per co
 | Channel System | Channel registry (`src/channels/registry.ts`) | Channels self-register at startup |
 | Message Storage | SQLite (better-sqlite3) | Store messages for polling |
 | Container Runtime | Containers (Linux VMs) | Isolated environments for agent execution |
-| Agent | @anthropic-ai/claude-agent-sdk (0.2.29) | Run Claude with tools and MCP servers |
+| Agent | @github/copilot (GitHub Copilot CLI) | Run the agent with tools and MCP servers |
 | Browser Automation | agent-browser + Chromium | Web interaction and screenshots |
 | Runtime | Node.js 20+ | Host process for routing and scheduling |
 
@@ -382,22 +382,17 @@ Additional mounts appear at `/workspace/extra/{containerPath}` inside the contai
 
 **Mount syntax note:** Read-write mounts use `-v host:container`, but readonly mounts require `--mount "type=bind,source=...,target=...,readonly"` (the `:ro` suffix may not work on all runtimes).
 
-### Claude Authentication
+### GitHub Copilot Authentication
 
-Configure authentication in a `.env` file in the project root. Two options:
+Configure authentication in a `.env` file in the project root:
 
-**Option 1: Claude Subscription (OAuth token)**
 ```bash
-CLAUDE_CODE_OAUTH_TOKEN=sk-ant-oat01-...
-```
-The token can be extracted from `~/.claude/.credentials.json` if you're logged in to Claude Code.
-
-**Option 2: Pay-per-use API Key**
-```bash
-ANTHROPIC_API_KEY=sk-ant-api03-...
+GITHUB_TOKEN=ghp_...
 ```
 
-Only the authentication variables (`CLAUDE_CODE_OAUTH_TOKEN` and `ANTHROPIC_API_KEY`) are extracted from `.env` and written to `data/env/env`, then mounted into the container at `/workspace/env-dir/env` and sourced by the entrypoint script. This ensures other environment variables in `.env` are not exposed to the agent. This workaround is needed because some container runtimes lose `-e` environment variables when using `-i` (interactive mode with piped stdin).
+The token is used by the GitHub Copilot CLI (`copilot`) inside the container. You can also use OneCLI to manage credentials via the OneCLI gateway — run `onecli --help` for details.
+
+Only `GITHUB_TOKEN` (and `GH_TOKEN` as an alias) are extracted from `.env` and written to `data/env/env`, then mounted into the container at `/workspace/env-dir/env` and sourced by the entrypoint script. This ensures other environment variables in `.env` are not exposed to the agent. This workaround is needed because some container runtimes lose `-e` environment variables when using `-i` (interactive mode with piped stdin).
 
 ### Changing the Assistant Name
 
