@@ -120,7 +120,17 @@ export async function startRemoteControl(
 
   let proc;
   try {
-    proc = spawn('copilot', ['--remote', '--yolo', '--autopilot'], {
+    // Build model flags from env
+    const splitArgs = (s = '') => {
+      const re = /(?:[^\s"]+|"[^"]*")+/g;
+      const matches = s.match(re) || [];
+      return matches.map((m: string) => m.replace(/^"|"$/g, ''));
+    };
+    const model = process.env.COPILOT_MODEL || 'gpt-5-mini';
+    const modelArgs = splitArgs(process.env.COPILOT_MODEL_ARGS || '--reasoning=high');
+    const args = ['--model', model, ...modelArgs, '--remote', '--yolo', '--autopilot'];
+
+    proc = spawn('copilot', args, {
       cwd,
       stdio: ['pipe', stdoutFd, stderrFd],
       detached: true,

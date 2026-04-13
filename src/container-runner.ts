@@ -248,12 +248,14 @@ async function buildContainerArgs(
       { containerName },
       'OneCLI gateway not reachable — falling back to .env credentials',
     );
-    // Fall back: read GitHub token directly from .env and inject into container.
+    // Fall back: read GitHub token and optional model defaults directly from .env and inject into container.
     // Checked in precedence order per copilot CLI docs.
     const envVars = readEnvFile([
       'COPILOT_GITHUB_TOKEN',
       'GH_TOKEN',
       'GITHUB_TOKEN',
+      'COPILOT_MODEL',
+      'COPILOT_MODEL_ARGS',
     ]);
     const token =
       envVars['COPILOT_GITHUB_TOKEN'] ||
@@ -261,15 +263,19 @@ async function buildContainerArgs(
       envVars['GITHUB_TOKEN'];
     if (token) {
       args.push('-e', `GITHUB_TOKEN=${token}`);
-      logger.info(
-        { containerName },
-        'GitHub token injected from .env fallback',
-      );
+      logger.info({ containerName }, 'GitHub token injected from .env fallback');
     } else {
-      logger.warn(
-        { containerName },
-        'No GitHub token found in .env — copilot will fail to authenticate',
-      );
+      logger.warn({ containerName }, 'No GitHub token found in .env — copilot will fail to authenticate');
+    }
+
+    if (envVars['COPILOT_MODEL']) {
+      args.push('-e', `COPILOT_MODEL=${envVars['COPILOT_MODEL']}`);
+      logger.info({ containerName }, 'COPILOT_MODEL injected from .env fallback');
+    }
+
+    if (envVars['COPILOT_MODEL_ARGS']) {
+      args.push('-e', `COPILOT_MODEL_ARGS=${envVars['COPILOT_MODEL_ARGS']}`);
+      logger.info({ containerName }, 'COPILOT_MODEL_ARGS injected from .env fallback');
     }
   }
 

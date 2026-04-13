@@ -145,7 +145,16 @@ async function runCopilot(
 ): Promise<{ result: string; newSessionId?: string; exitCode: number | null }> {
   const sessionsBefore = snapshotSessions();
 
-  const args = ['--autopilot', '--yolo', '-p', prompt];
+  function splitArgs(s: string = ''): string[] {
+    const re = /(?:[^\s"]+|"[^"]*")+/g;
+    const matches = s.match(re) || [];
+    return matches.map((m) => m.replace(/^"|"$/g, ''));
+  }
+
+  const model = process.env.COPILOT_MODEL || 'gpt-5-mini';
+  const modelArgs = splitArgs(process.env.COPILOT_MODEL_ARGS || '--reasoning=high');
+
+  const args = ['--model', model, ...modelArgs, '--autopilot', '--yolo', '-p', prompt];
   if (sessionId) {
     args.push(`--resume=${sessionId}`);
   }
@@ -153,6 +162,7 @@ async function runCopilot(
   log(
     `Running copilot (session: ${sessionId || 'new'}, prompt length: ${prompt.length})`,
   );
+  log(`copilot args: ${args.slice(0, 6).join(' ')}${args.length > 6 ? ' ...' : ''}`);
 
   return new Promise((resolve, reject) => {
     const proc = spawn('copilot', args, {
