@@ -152,7 +152,7 @@ async function runCopilot(
   }
 
   const model = process.env.COPILOT_MODEL || 'gpt-5-mini';
-  const modelArgs = splitArgs(process.env.COPILOT_MODEL_ARGS || '--reasoning=high');
+  const modelArgs = splitArgs(process.env.COPILOT_MODEL_ARGS || '');
 
   const args = ['--model', model, ...modelArgs, '--autopilot', '--yolo', '-p', prompt];
   if (sessionId) {

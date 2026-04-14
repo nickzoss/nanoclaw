@@ -41,7 +41,7 @@ fi
 
 if [ -z "$COPILOT_MODEL_ARGS" ]; then
   MA=$(read_env_key 'COPILOT_MODEL_ARGS')
-  if [ -z "$MA" ]; then MA='--reasoning=high'; fi
+  if [ -z "$MA" ]; then MA=''; fi
   export COPILOT_MODEL_ARGS="$MA"
 fi
 
