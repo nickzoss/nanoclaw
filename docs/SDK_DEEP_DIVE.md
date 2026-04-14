@@ -1,5 +1,7 @@
 # Claude Agent SDK Deep Dive
 
+> NOTE: This document describes the legacy Claude Agent SDK. NanoClaw has migrated to the GitHub Copilot CLI (`copilot`). Keep this doc for historical reference — most runtime and setup docs now reference Copilot and the `.copilot/` session layout.
+
 Findings from reverse-engineering `@anthropic-ai/claude-agent-sdk` v0.2.29–0.2.34 to understand how `query()` works, why agent teams subagents were being killed, and how to fix it. Supplemented with official SDK reference docs.
 
 ## Architecture

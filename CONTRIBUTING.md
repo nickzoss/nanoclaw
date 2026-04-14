@@ -21,7 +21,7 @@
 
 ## Skills
 
-NanoClaw uses [Claude Code skills](https://code.claude.com/docs/en/skills) — markdown files with optional supporting files that teach Claude how to do something. There are four types of skills in NanoClaw, each serving a different purpose.
+NanoClaw uses skills (SKILL.md) — markdown files with optional supporting files that teach the agent how to do something. There are four types of skills in NanoClaw, each serving a different purpose. See `docs/skills-as-branches.md` for the skill format and workflow.
 
 ### Why skills?
 
@@ -69,7 +69,7 @@ Standalone tools that ship code files alongside the SKILL.md. The SKILL.md tells
 
 Workflows and guides with no code changes. The SKILL.md is the entire skill — Claude follows the instructions to perform a task.
 
-**Location:** `.claude/skills/` on `main`
+**Location:** `container/skills/` on `main`
 
 **Examples:** `/setup`, `/debug`, `/customize`, `/update-nanoclaw`, `/update-skills`
 
@@ -80,13 +80,13 @@ Workflows and guides with no code changes. The SKILL.md is the entire skill — 
 
 #### 4. Container skills (agent runtime)
 
-Skills that run inside the agent container, not on the host. These teach the container agent how to use tools, format output, or perform tasks. They are synced into each group's `.claude/skills/` directory when a container starts.
+Skills that run inside the agent container, not on the host. These teach the container agent how to use tools, format output, or perform tasks. They are synced into each group's `.copilot/agents/` directory when a container starts.
 
 **Location:** `container/skills/<name>/`
 
 **Examples:** `agent-browser` (web browsing), `capabilities` (/capabilities command), `status` (/status command), `slack-formatting` (Slack mrkdwn syntax)
 
-**Key difference:** These are NOT invoked by the user on the host. They're loaded by Claude Code inside the container and influence how the agent behaves.
+**Key difference:** These are NOT invoked by the user on the host. They're loaded inside the container agent runtime and influence how the agent behaves.
 
 **Guidelines:**
 - Follow the same SKILL.md + frontmatter format
@@ -95,7 +95,7 @@ Skills that run inside the agent container, not on the host. These teach the con
 
 ### SKILL.md format
 
-All skills use the [Claude Code skills standard](https://code.claude.com/docs/en/skills):
+All skills follow the SKILL.md frontmatter format and conventions; see `docs/skills-as-branches.md` for details and examples:
 
 ```markdown
 ---
@@ -109,7 +109,7 @@ Instructions here...
 **Rules:**
 - Keep SKILL.md **under 500 lines** — move detail to separate reference files
 - `name`: lowercase, alphanumeric + hyphens, max 64 chars
-- `description`: required — Claude uses this to decide when to invoke the skill
+- `description`: required — the agent uses this to decide when to invoke the skill
 - Put code in separate files, not inline in the markdown
 - See the [skills standard](https://code.claude.com/docs/en/skills) for all available frontmatter fields
 

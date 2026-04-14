@@ -32,9 +32,9 @@ No configuration sprawl. If you want different behavior, modify the code. The co
 
 ### AI-Native Development
 
-I don't need an installation wizard - Claude Code guides the setup. I don't need a monitoring dashboard - I ask Claude Code what's happening. I don't need elaborate logging UIs - I ask Claude to read the logs. I don't need debugging tools - I describe the problem and Claude fixes it.
+I don't need an installation wizard - the Copilot CLI guides the setup. I don't need a monitoring dashboard - I ask the agent what's happening. I don't need elaborate logging UIs - I ask the agent to read the logs. I don't need debugging tools - I describe the problem and the agent helps fix it.
 
-The codebase assumes you have an AI collaborator. It doesn't need to be excessively self-documenting or self-debugging because Claude is always there.
+The codebase assumes you have an AI collaborator. It doesn't need to be excessively self-documenting or self-debugging because the agent is available.
 
 ### Skills Over Features
 
@@ -59,7 +59,7 @@ Skills we'd like to see contributed:
 A personal Claude assistant accessible via messaging, with minimal custom code.
 
 **Core components:**
-- **Claude Agent SDK** as the core agent
+- **Copilot CLI / agent runtime** as the core agent
 - **Containers** for isolated agent execution (Linux VMs)
 - **Multi-channel messaging** (WhatsApp, Telegram, Discord, Slack, Gmail) — add exactly the channels you need
 - **Persistent memory** per conversation and globally
@@ -138,7 +138,7 @@ A personal Claude assistant accessible via messaging, with minimal custom code.
 - Tools: `schedule_task`, `list_tasks`, `pause_task`, `resume_task`, `cancel_task`, `send_message`
 - Tasks stored in SQLite with run history
 - Scheduler loop checks for due tasks every minute
-- Tasks execute Claude Agent SDK in containerized group context
+- Tasks execute using the Copilot CLI inside the containerized group context
 
 ### Web Access
 - Built-in WebSearch and WebFetch tools
@@ -156,8 +156,8 @@ A personal Claude assistant accessible via messaging, with minimal custom code.
 
 ### Philosophy
 - Minimal configuration files
-- Setup and customization done via Claude Code
-- Users clone the repo and run Claude Code to configure
+- Setup and customization done via the Copilot CLI
+- Users clone the repo and run `copilot` to configure
 - Each user gets a custom setup matching their exact needs
 
 ### Skills

@@ -11,13 +11,13 @@
 - Persistence lives in `src/db.ts`: SQLite stores chats, messages, router state, sessions, registered groups, and scheduled tasks. Chat metadata is stored broadly; message content is what drives prompt reconstruction.
 - Message prompts are built in `src/router.ts` as XML-like `<messages>` payloads. Outbound text strips `<internal>...</internal>` blocks; preserve that contract when touching agent I/O.
 - `src/group-queue.ts` enforces per-group serialization with a global concurrency cap. Message containers can stay alive for follow-up IPC input; task containers are queued through the same group gate.
-- `src/task-scheduler.ts` polls due tasks, then runs them in the owning group context. `context_mode: 'group'` reuses that group’s Claude session; `'isolated'` starts fresh.
+- `src/task-scheduler.ts` polls due tasks, then runs them in the owning group context. `context_mode: 'group'` reuses that group’s Copilot session; `'isolated'` starts fresh.
 - `src/ipc.ts` is filesystem-based IPC under `data/ipc/<group>/`. Authorization comes from the source folder namespace, not from trusting JSON payload fields.
 
 ## Container and security model
 - `src/container-runner.ts` is the main sandbox boundary. Non-main groups get writable `groups/<folder>` plus read-only `groups/global/`; main gets project root read-only plus writable `store/`, its own group folder, and writable `groups/global/`.
-- Each group also gets isolated runtime state in `data/sessions/<group>/.claude` and its own copied `container/agent-runner/src` tree, so agent customization is group-local.
-- Container skills in `container/skills/*` are copied into each group’s `.claude/skills/` at startup; keep them small because they share context budget.
+- Each group also gets isolated runtime state in `data/sessions/<group>/.copilot` and its own copied `container/agent-runner/src` tree, so agent customization is group-local.
+- Container skills in `container/skills/*` are copied into each group’s `.copilot/agents/` (or the container's Copilot agent directory) at startup; keep them small because they share context budget.
 - Secrets are not mounted into containers. `OneCLI` config is applied in `src/container-runner.ts`, and `.env` is explicitly shadowed for main.
 - Additional mounts must go through `validateAdditionalMounts()` in `src/mount-security.ts`; the allowlist lives outside the repo at `~/.config/nanoclaw/mount-allowlist.json`.
 - Preserve group-folder safety checks by using helpers from `src/group-folder.ts` rather than hand-building group or IPC paths.

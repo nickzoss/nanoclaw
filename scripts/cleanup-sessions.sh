@@ -69,7 +69,7 @@ is_active() {
 
 for group_dir in "$SESSIONS_DIR"/*/; do
   [ -d "$group_dir" ] || continue
-  jsonl_dir="$group_dir/.claude/projects/-workspace-group"
+  jsonl_dir="$group_dir/.copilot/projects/-workspace-group"
   [ -d "$jsonl_dir" ] || continue
 
   for jsonl in "$jsonl_dir"/*.jsonl; do
@@ -93,7 +93,7 @@ done
 # --- Prune debug logs (>3 days, skip files named after active sessions) ---
 
 for group_dir in "$SESSIONS_DIR"/*/; do
-  debug_dir="$group_dir/.claude/debug"
+  debug_dir="$group_dir/.copilot/debug"
   [ -d "$debug_dir" ] || continue
   while IFS= read -r -d '' f; do
     fname=$(basename "$f" .txt)
@@ -105,7 +105,7 @@ done
 # --- Prune todo files (>3 days, skip files named after active sessions) ---
 
 for group_dir in "$SESSIONS_DIR"/*/; do
-  todos_dir="$group_dir/.claude/todos"
+  todos_dir="$group_dir/.copilot/todos"
   [ -d "$todos_dir" ] || continue
   while IFS= read -r -d '' f; do
     fname=$(basename "$f" .json)
@@ -122,7 +122,7 @@ done
 # --- Prune telemetry (>7 days, skip files named after active sessions) ---
 
 for group_dir in "$SESSIONS_DIR"/*/; do
-  telem_dir="$group_dir/.claude/telemetry"
+  telem_dir="$group_dir/.copilot/telemetry"
   [ -d "$telem_dir" ] || continue
   while IFS= read -r -d '' f; do
     fname=$(basename "$f")
