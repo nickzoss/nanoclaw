@@ -6,7 +6,7 @@
 #   echo '<json>' | ./test-run.sh
 #   ./test-run.sh                      # uses default test payload
 #   GITHUB_TOKEN=xxx ./test-run.sh     # override token from env
-#   COPILOT_MODEL="gpt-5-mini" COPILOT_MODEL_ARGS="--reasoning=high" ./test-run.sh
+#   COPILOT_MODEL="gpt-5-mini" COPILOT_MODEL_ARGS="--reasoning-effort=high" ./test-run.sh
 
 set -e
 
